@@ -1,5 +1,18 @@
 import streamlit as st
 from dotenv import load_dotenv
+from PyPDF2 import PdfReader
+
+# creating function for pdf to raw data
+def get_pdf_text(pdf_docs):
+    # creating empty string variable to store content of PDFs
+    text = ''
+    for pdf in pdf_docs:
+        pdf_reader = PdfReader(pdf)
+
+        for page in pdf_reader.pages:
+            text += page.extract_text()
+    return text
+
 
 
 def main():
@@ -11,8 +24,18 @@ def main():
 
     with st.sidebar:
         st.subheader("Your Document's")
-        st.file_uploader("Upload your PDFs here and click on Process")
-        st.button("Process")
+        pdf_docs = st.file_uploader(
+            "Upload your PDFs here and click on Process",
+            accept_multiple_files=True
+            )
+        if st.button("Process"):
+            with st.spinner("Processing"):
+                # get the pdf text
+                raw_text = get_pdf_text(pdf_docs)
+                st.write(raw_text)
+                # get the text chunks
+
+                # create vectore store
 
 if __name__ == '__main__':
-    main()
+    main() 
