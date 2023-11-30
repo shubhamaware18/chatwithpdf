@@ -1,18 +1,34 @@
 import streamlit as st
 from dotenv import load_dotenv
 from PyPDF2 import PdfReader
+from langchain.text_splitter import CharacterTextSplitter
+
 
 # creating function for pdf to raw data
 def get_pdf_text(pdf_docs):
+    """
+    This is the function for data from multiple PDFs
+    """
     # creating empty string variable to store content of PDFs
-    text = ''
+    text = ""
     for pdf in pdf_docs:
         pdf_reader = PdfReader(pdf)
-
         for page in pdf_reader.pages:
             text += page.extract_text()
     return text
 
+def get_text_chunks(text):
+    """
+    This is the function for reating data chunks with help of langchain model CharacteTextSplitter
+    """
+    text_splitter = CharacterTextSplitter(
+        separator="\n",
+        chunk_size=1000,
+        chunk_overlap=200,
+        length_function=len
+        )
+    chunks = text_splitter.split_text(text)
+    return chunks
 
 
 def main():
@@ -32,10 +48,18 @@ def main():
             with st.spinner("Processing"):
                 # get the pdf text
                 raw_text = get_pdf_text(pdf_docs)
-                st.write(raw_text)
-                # get the text chunks
+                # st.write(raw_text)
 
-                # create vectore store
+                # get the text chunks
+                text_chunks = get_text_chunks(raw_text)
+                # st.write(text_chunks)
+
+                # create vector store(Embedings)
+
+                # Note: we can you OpenAI Embeding models for Embedings if you are doing it for any organization 
+                # But We will Open source Embedings (Instructor Finetuned Text Embedings)
+                
+
 
 if __name__ == '__main__':
     main() 
