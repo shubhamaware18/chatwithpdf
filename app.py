@@ -2,6 +2,8 @@ import streamlit as st
 from dotenv import load_dotenv
 from PyPDF2 import PdfReader
 from langchain.text_splitter import CharacterTextSplitter
+from langchain.embeddings import OpenAIEmbeddings, HuggingFaceInstructEmbeddings
+from langchain.vectorstores import FAISS
 
 
 # creating function for pdf to raw data
@@ -31,9 +33,18 @@ def get_text_chunks(text):
     return chunks
 
 
+def get_vectorstore(text_chunks):
+    # embeddings = OpenAIEmbeddings()
+    embeddings = HuggingFaceInstructEmbeddings(model_name="hkunlp/instructor-xl")
+    vectorstore = FAISS.from_texts(texts=text_chunks, embedding=embeddings)
+    return vectorstore
+
+
+
 def main():
     load_dotenv()
-    st.set_page_config(page_title='Chat With Multiple PDFs',page_icon=':books:')
+    st.set_page_config(page_title='Chat With Multiple PDFs'
+                       ,page_icon=':books:')
 
     st.header('Chat with multiple PDFs :books:')
     st.text_input('Ask a question about your documents:')
@@ -44,6 +55,7 @@ def main():
             "Upload your PDFs here and click on Process",
             accept_multiple_files=True
             )
+        
         if st.button("Process"):
             with st.spinner("Processing"):
                 # get the pdf text
