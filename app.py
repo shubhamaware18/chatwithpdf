@@ -1,9 +1,12 @@
 import streamlit as st
 from dotenv import load_dotenv
 from PyPDF2 import PdfReader
-from langchain.text_splitter import CharacterTextSplitter
-from langchain.embeddings import OpenAIEmbeddings, HuggingFaceInstructEmbeddings
-from langchain.vectorstores import FAISS
+from langchain_community.text_splitter import CharacterTextSplitter
+from langchain_community.embeddings import OpenAIEmbeddings, HuggingFaceInstructEmbeddings
+from langchain_community.vectorstores import FAISS
+from langchain_community.memory import ConversationalBufferMemory
+from langchain_community.chains import ConversationalRetrievalChain
+from langchain_community.chat_models import ChatOpenAI
 
 
 # creating function for pdf to raw data
@@ -40,11 +43,23 @@ def get_vectorstore(text_chunks):
     return vectorstore
 
 
+def get_conversation_chain(vectorstore):
+    llm = ChatOpenAI()
+    memory =  ConversationalBufferMemory(memory_key = 'chat_hostory', return_messages = True)
+    conversation_chain = ConversationalRetrievalChain.from_llm(
+        llm = llm,
+        retriever = vectorstore.as_retriever(),
+        memory = memory
+    )
+    return conversation_chain
 
 def main():
     load_dotenv()
     st.set_page_config(page_title='Chat With Multiple PDFs'
                        ,page_icon=':books:')
+    
+    if 'conversation' not in st.session_state:
+        st.session_state.conversation = None
 
     st.header('Chat with multiple PDFs :books:')
     st.text_input('Ask a question about your documents:')
@@ -67,11 +82,14 @@ def main():
                 # st.write(text_chunks)
 
                 # create vector store(Embedings)
-
+                vectorestore = get_vectorstore(text_chunks)
+                
                 # Note: we can you OpenAI Embeding models for Embedings if you are doing it for any organization 
                 # But We will Open source Embedings (Instructor Finetuned Text Embedings)
                 
-
+                # Create conversation chains
+                st.session_state.conversation = get_conversation_chain(vectorestore)
+                
 
 if __name__ == '__main__':
     main() 
