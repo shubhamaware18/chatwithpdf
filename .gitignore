@@ -61,7 +61,7 @@ target/
 .env
 
 # exclude virtual Envt from source control by default
-/venv/
+/chatpdf/
 
 # Database
 *.db

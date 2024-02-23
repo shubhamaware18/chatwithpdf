@@ -1,12 +1,12 @@
 import streamlit as st
 from dotenv import load_dotenv
 from PyPDF2 import PdfReader
-from langchain_community.text_splitter import CharacterTextSplitter
-from langchain_community.embeddings import OpenAIEmbeddings, HuggingFaceInstructEmbeddings
-from langchain_community.vectorstores import FAISS
-from langchain_community.memory import ConversationalBufferMemory
-from langchain_community.chains import ConversationalRetrievalChain
-from langchain_community.chat_models import ChatOpenAI
+from langchain.text_splitter import CharacterTextSplitter
+from langchain.embeddings import OpenAIEmbeddings, HuggingFaceInstructEmbeddings
+from langchain.vectorstores import FAISS
+from langchain.memory import ConversationalBufferMemory
+from langchain.chains import ConversationalRetrievalChain
+from langchain.chat_models import ChatOpenAI
 
 
 # creating function for pdf to raw data
